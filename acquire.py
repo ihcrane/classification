@@ -1,8 +1,9 @@
 from env import get_connection
 import pandas as pd
+import os as os
 
 def get_titanic_data(get_con_func):
-    
+    import os
     if os.path.isfile('titanic.csv'):
         
         return pd.read_csv('titanic.csv')
