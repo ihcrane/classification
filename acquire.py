@@ -1,9 +1,8 @@
 from env import get_connection
 import pandas as pd
-import os as os
+import os
 
 def get_titanic_data(get_con_func):
-    import os
     if os.path.isfile('titanic.csv'):
         
         return pd.read_csv('titanic.csv')
@@ -38,7 +37,7 @@ def get_telco_data(get_con_func):
         return pd.read_csv('telco.csv')
     
     else:
-        url = get_con_func('telco_db')
+        url = get_con_func('telco_churn')
         query = '''SELECT * FROM customers
                     JOIN internet_service_types USING(internet_service_type_id)
                     JOIN contract_types USING(contract_type_id)
