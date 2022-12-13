@@ -767,14 +767,14 @@ train.shape, validate.shape, test.shape
 
 # # Exercises
 
-# In[261]:
+# In[489]:
 
 
 iris = prep_iris(get_iris_data(get_connection))
 iris.head()
 
 
-# In[485]:
+# In[490]:
 
 
 train, val, test = train_val_test(iris, 'species')
@@ -861,6 +861,12 @@ for col in num_vars:
 # - On average the virginica species is larger.
 # 
 
+# In[ ]:
+
+
+stats.manwhitneyu(train[train['species']='virginica']['petal_width'])
+
+
 # ## Multivariate Stats
 
 # In[312]:
@@ -868,6 +874,26 @@ for col in num_vars:
 
 sns.pairplot(train, hue='species', corner=True)
 
+
+# In[491]:
+
+
+train['sepal_area'] = train['sepal_length'] * train['sepal_width']
+train['petal_area'] = train['petal_length'] * train['petal_width']
+
+
+# In[492]:
+
+
+sns.relplot(x='sepal_area', y='petal_area', data=train, hue='species')
+
+
+# ## Takeaways:
+# - Petal length and width can be used to distinguish from the others, and can be helpful for the other 2. 
+# - Setosa has the shortest petal length and width. 
+# - Virginica has the longest of both of these. 
+# - Sepal length can also help separrate virginica and versicolor, as virginica is slightly shorter. 
+# - Virginica and versicolor overlap in sepal width. Speal area does not seem to add any value beyond what 
 
 # In[314]:
 
@@ -883,17 +909,19 @@ for col in num_vars:
     plt.show()
 
 
-# In[469]:
+# In[500]:
 
 
-train_melt = train.melt(id_vars='species')
+train_melt = train.melt(id_vars=['species'], var_name='measures', value_name='values')
 train_melt.head()
 
 
-# In[472]:
+# In[505]:
 
 
-sns.swarmplot(x='variable', y='value', data=train_melt, hue='species')
+sns.swarmplot(x='measures', y='values', data=train_melt, hue='species')
+plt.title('Difference in measurements across Species')
+plt.xticks(rotation=45)
 
 
 # In[332]:
@@ -964,7 +992,7 @@ sns.histplot(x='sepal_area', data=train, hue='species')
 
 # # Titanic
 
-# In[435]:
+# In[511]:
 
 
 titanic = get_titanic_data(get_connection)
@@ -972,19 +1000,19 @@ titanic = prep_titanic(titanic)
 titanic.head()
 
 
-# In[436]:
+# In[512]:
 
 
 titanic.info()
 
 
-# In[437]:
+# In[513]:
 
 
 titanic['embark_town'].value_counts()
 
 
-# In[458]:
+# In[528]:
 
 
 from prepare import train_val_test
@@ -992,7 +1020,7 @@ from prepare import train_val_test
 train, val, test = train_val_test(titanic, 'survived')
 
 
-# In[459]:
+# In[515]:
 
 
 num_vars = titanic.select_dtypes(exclude=['object', 'uint8'])
@@ -1018,13 +1046,83 @@ for col in num_vars:
     plt.show()
 
 
-# In[462]:
+# In[519]:
 
 
 for col in cat_vars:
-    sns.barplot(x='survived', y=col, data=train)
+    sns.barplot(x=col, y='survived', data=train)
+    plt.title(f'Rate of Survival for each {col}')
     plt.show()
 
+
+# ## Takeaways:
+# - More likely to survive (based on visualizations): first class, women, traveling alone, 1 sibling or spouse.
+# - Drivers are sex, pclass, alone, sibsp
+# - We wouldnt want to bin fare as that won't add new value.
+# - No columns to be added now
+# - No features to be added right now
+# - Nothing surprising
+# 
+
+# **Is the impact of traveling alone different based on sex?**
+
+# In[521]:
+
+
+female = train[train['sex']=='female']
+male = train[train['sex']=='male']
+
+sns.barplot(x='alone', y='survived', data=train, hue='sex')
+
+# it looks like being alone only impacts males, who are less likely to survive in that case
+
+
+# - it looks like being alone only impacts males, who are less likely to survive in that case
+# 
+# **Does class impact the survival rate of males or females**
+
+# In[522]:
+
+
+sns.barplot(x='pclass', y='survived', data=train, hue='sex')
+
+
+# - the females who didn't survive appear to be in 3rd class
+# - if a male survived, he was likely in 1st class
+
+# **of the females in 3rd class, were they more likely to survive if they were alone or not alone (or neither)**
+
+# In[524]:
+
+
+sns.barplot(x='pclass', y='survived', data=train[train['sex']=='female'], hue='alone')
+
+
+# Run a test to see if females in 3rd class who travel alone are significantly more likely to survive than those not traveling alone  
+# H_0: survivall rate of females in 3rd class alone <= survivale rate of females in 3rd class not alone  
+# H_A: survivall rate of females in 3rd class alone > survivale rate of females in 3rd class not alone
+# 
+# alpha = .05  
+# run a chi-square test 
+
+# In[532]:
+
+
+sample = train[(train['pclass'] == 3) & (train['sex'] == 'female')]
+observed = pd.crosstab(sample['alone'], sample['survived'])
+chi2, p, df, expected = stats.chi2_contingency(observed)
+
+alpha = .05
+
+p< alpha
+
+
+# ## Takeaways:
+# - it looks like being alone only impacts males, who are less likely to survive in that case
+# - the females who didn't survive appear to be in 3rd class
+# - if a male survived, he was likely in 1st class
+# - females appear more likely to survive if they were traveling alone
+# 
 
 # In[463]:
 
