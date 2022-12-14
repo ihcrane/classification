@@ -11,3 +11,48 @@ def train_val_test(df, col):
     validate, test = train_test_split(val_test, train_size=.5, random_state=seed, stratify=val_test[col])
     
     return train, validate, test
+
+
+
+
+def prep_titanic(titanic):
+    titanic.drop(columns=['class','embarked', 'passenger_id', 'deck', 'age', 'Unnamed: 0'], inplace=True)
+    
+    titanic_dummies = pd.get_dummies(titanic[['sex', 'embark_town']], drop_first=True)
+    titanic = pd.concat([titanic, titanic_dummies], axis=1)
+    
+    return titanic
+
+
+
+def prep_telco(telco):
+    telco.drop(columns=['Unnamed: 0', 'payment_type_id', 'contract_type_id', 
+                        'internet_service_type_id', 'customer_id'], inplace=True)
+    
+    telco['total_charges'] = (telco['total_charges'] + '0').astype('float')
+
+    
+    telco_dummies = pd.get_dummies(telco[['gender', 'partner', 'dependents', 
+                                      'phone_service', 'multiple_lines', 
+                                      'online_security', 'online_backup', 
+                                      'device_protection', 'tech_support', 
+                                      'streaming_tv', 'streaming_movies', 
+                                      'paperless_billing', 'churn', 'internet_service_type', 
+                                      'contract_type', 'payment_type']], drop_first=True)
+    
+    telco = pd.concat([telco, telco_dummies], axis=1)
+    
+    return telco
+
+
+
+
+def prep_iris(iris):
+    iris.drop(columns=['species_id', 'measurement_id', 'Unnamed: 0'], inplace=True)
+    
+    iris.rename(columns={'species_name':'species'}, inplace=True)
+    
+    iris_dummies = pd.get_dummies(iris[['species']], drop_first=True)
+    iris = pd.concat([iris, iris_dummies], axis=1)
+    
+    return iris
