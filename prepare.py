@@ -5,6 +5,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 
 def train_val_test(df, col):
+    
+    '''
+    This function is used to split the data into train, validate, and test variables
+    '''
+    
     seed = 42 
     train, val_test = train_test_split(df, train_size=.7, random_state=seed, stratify=df[col])
     
@@ -16,6 +21,12 @@ def train_val_test(df, col):
 
 
 def prep_titanic(titanic):
+    
+    '''
+    This function is used to drop unnecessary columns for the titanic data 
+    and create dummies for the sec and embark_town columns
+    '''
+    
     titanic.drop(columns=['class','embarked', 'passenger_id', 'deck', 'age', 'Unnamed: 0'], inplace=True)
     
     titanic_dummies = pd.get_dummies(titanic[['sex', 'embark_town']], drop_first=True)
@@ -26,6 +37,12 @@ def prep_titanic(titanic):
 
 
 def prep_telco(telco):
+    
+    '''
+    This function is used to drop unnecessary columns, convert the total_charges column to a float
+    and create dummies for the object columns for better data manipulation later
+    '''
+    
     telco.drop(columns=['Unnamed: 0', 'payment_type_id', 'contract_type_id', 
                         'internet_service_type_id', 'customer_id'], inplace=True)
     
@@ -48,6 +65,12 @@ def prep_telco(telco):
 
 
 def prep_iris(iris):
+    
+    '''
+    This function is used to drop unecessary columns, rename the species_name column
+    and created dummies for the species column
+    '''
+    
     iris.drop(columns=['species_id', 'measurement_id', 'Unnamed: 0'], inplace=True)
     
     iris.rename(columns={'species_name':'species'}, inplace=True)
