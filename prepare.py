@@ -4,18 +4,17 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 
-def train_val_test(df, col):
+def train_val_test(df, target, seed=42):
     
     '''
     This function is used to split the data into train, validate, and test variables
     '''
     
-    seed = 42 
-    train, val_test = train_test_split(df, train_size=.7, random_state=seed, stratify=df[col])
+    train, val_test = train_test_split(df, train_size=0.7, random_state=seed, stratify=df[target])
     
-    validate, test = train_test_split(val_test, train_size=.5, random_state=seed, stratify=val_test[col])
+    val, test = train_test_split(val_test, train_size=0.5, random_state=seed, stratify=val_test[target])
     
-    return train, validate, test
+    return train, val, test
 
 
 
